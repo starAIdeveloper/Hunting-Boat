@@ -4,14 +4,6 @@ using UnityEngine.EventSystems;
 
 namespace HuntingBoat
 {
-    public sealed class HeldControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
-    {
-        public System.Action<bool> Changed;
-        public void OnPointerDown(PointerEventData data) { Changed?.Invoke(true); }
-        public void OnPointerUp(PointerEventData data) { Changed?.Invoke(false); }
-        private void OnDisable() { Changed?.Invoke(false); }
-    }
-
     public sealed class OceanHud : MonoBehaviour
     {
         private OceanGame game;
@@ -23,7 +15,7 @@ namespace HuntingBoat
         private Button castButton;
         private RawImage miniMap, largeMap;
         private Texture2D mapTexture;
-        private float uiScale;
+        private GameObject mapPanelObject;
         private readonly Color panelColor = new Color(.015f, .07f, .11f, .92f);
         private readonly Color cyan = new Color(.15f, .85f, .94f);
 
@@ -31,7 +23,7 @@ namespace HuntingBoat
         {
             game = owner; font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             canvas = gameObject.AddComponent<Canvas>(); canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            var scaler = gameObject.AddComponent<CanvasScaler>(); scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize; scaler.referenceResolution = new Vector2(1280, 720); scaler.matchWidthOrHeight = .5f;
+            var scaler = gameObject.AddComponent<CanvasScaler>(); scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize; scaler.referenceResolution = new Vector2(1280, 720); scaler.matchWidthOrHeight = 0;
             gameObject.AddComponent<GraphicRaycaster>();
             if (!FindFirstObjectByType<EventSystem>()) { var e = new GameObject("UI Event System"); e.AddComponent<EventSystem>(); e.AddComponent<StandaloneInputModule>(); }
             Label(transform, "HUNTING  BOAT", new Vector2(25, -20), new Vector2(360, 45), 30, cyan, new Vector2(0, 1));
@@ -45,6 +37,7 @@ namespace HuntingBoat
             economy = Label(transform, "", new Vector2(-25, -138), new Vector2(290, 55), 14, cyan, new Vector2(1, 1)); economy.alignment = TextAnchor.UpperRight;
 
             var mapPanel = Panel(transform, new Vector2(25, 90), new Vector2(170, 170), new Vector2(0, 0));
+            mapPanelObject = mapPanel.gameObject;
             miniMap = ImageMap(mapPanel, new Vector2(8, -8), new Vector2(154, 154), new Vector2(0, 1));
             mapTexture = new Texture2D(256, 256, TextureFormat.RGB24, false); mapTexture.filterMode = FilterMode.Bilinear; miniMap.texture = mapTexture;
             var mapButton = Button(transform, "Map [M]", new Vector2(25, 52), new Vector2(170, 32), new Vector2(0, 0), ToggleMap);
@@ -59,12 +52,12 @@ namespace HuntingBoat
             Bar(fishingPanel.transform, new Vector2(15, -95), new Vector2(400, 9), out progressFill); progressFill.color = cyan;
             fishingPanel.SetActive(false);
 
-            driving = new GameObject("Touch helm controls", typeof(RectTransform)); driving.transform.SetParent(transform, false);
+            driving = new GameObject("Touch helm controls", typeof(RectTransform)); driving.transform.SetParent(transform, false); Stretch(driving.GetComponent<RectTransform>());
             Hold(driving.transform, "▲", new Vector2(110, 87), new Vector2(0, 0), held => game.TouchThrottle = held ? 1 : 0);
             Hold(driving.transform, "▼", new Vector2(110, 25), new Vector2(0, 0), held => game.TouchThrottle = held ? -1 : 0);
             Hold(driving.transform, "◀", new Vector2(40, 25), new Vector2(0, 0), held => game.TouchSteering = held ? -1 : 0);
             Hold(driving.transform, "▶", new Vector2(180, 25), new Vector2(0, 0), held => game.TouchSteering = held ? 1 : 0);
-            fighting = new GameObject("Touch fishing controls", typeof(RectTransform)); fighting.transform.SetParent(transform, false);
+            fighting = new GameObject("Touch fishing controls", typeof(RectTransform)); fighting.transform.SetParent(transform, false); Stretch(fighting.GetComponent<RectTransform>());
             Hold(fighting.transform, "REEL", new Vector2(-160, 110), new Vector2(1, 0), held => game.TouchReel = held);
             Hold(fighting.transform, "PULL", new Vector2(-85, 110), new Vector2(1, 0), held => game.TouchPull = held);
             Button(fighting.transform, "Release", new Vector2(-25, 190), new Vector2(140, 35), new Vector2(1, 0), () => game.Fishing.Release());
@@ -103,7 +96,7 @@ namespace HuntingBoat
             castButton.GetComponentInChildren<Text>().text = f.Phase == FishingPhase.Bite ? "HOOK! [F]" : active ? "Line deployed" : "Cast [F]";
             castButton.interactable = !game.MenuOpen && (!active || f.Phase == FishingPhase.Bite);
             bool touch = Application.isMobilePlatform || Screen.width < 900;
-            driving.SetActive(touch && !active && !game.MenuOpen); fighting.SetActive(active && !game.MenuOpen); controls.gameObject.SetActive(!touch);
+            driving.SetActive(touch && !active && !game.MenuOpen); fighting.SetActive(active && !game.MenuOpen); controls.gameObject.SetActive(!touch); mapPanelObject.SetActive(!touch);
             if (menu.activeSelf)
             {
                 string history = save.catches.Count == 0 ? "No fish landed yet." : "LAST CATCHES\n";
@@ -129,6 +122,7 @@ namespace HuntingBoat
         {
             var b = Button(parent, label, position, new Vector2(65, 54), anchor, () => { }); b.gameObject.AddComponent<HeldControl>().Changed = action;
         }
+        private static void Stretch(RectTransform rect) { rect.anchorMin = Vector2.zero; rect.anchorMax = Vector2.one; rect.offsetMin = rect.offsetMax = Vector2.zero; }
         private static void Place(RectTransform rect, Vector2 position, Vector2 size, Vector2 anchor)
         {
             rect.anchorMin = rect.anchorMax = anchor; rect.pivot = anchor; rect.anchoredPosition = position; rect.sizeDelta = size;
@@ -148,12 +142,12 @@ namespace HuntingBoat
             if (!mapTexture) return;
             var pixels = new Color[256 * 256]; var water = new Color(.015f, .14f, .20f);
             for (int i = 0; i < pixels.Length; i++) pixels[i] = water;
-            foreach (var island in game.World.Islands) Circle(pixels, Map(island), 13, new Color(.31f, .46f, .31f));
+            foreach (var island in game.World.Islands) Circle(pixels, Map(island), 9, new Color(.31f, .46f, .31f));
             for (int i = 0; i < game.World.Spots.Length; i++) Circle(pixels, Map(game.World.Spots[i]), i == game.TargetSpot ? 5 : 3, i == game.TargetSpot ? new Color(1, .75f, .1f) : cyan);
             Circle(pixels, Map(game.World.Boat.transform.position), 4, Color.white);
             mapTexture.SetPixels(pixels); mapTexture.Apply(false);
         }
-        private static Vector2Int Map(Vector3 p) { return new Vector2Int(Mathf.RoundToInt(128 + p.x / 4), Mathf.RoundToInt(128 + p.z / 4)); }
+        private static Vector2Int Map(Vector3 p) { return new Vector2Int(Mathf.RoundToInt(128 + p.x / 7), Mathf.RoundToInt(128 + p.z / 7)); }
         private static void Circle(Color[] pixels, Vector2Int center, int r, Color color)
         {
             for (int y = -r; y <= r; y++) for (int x = -r; x <= r; x++) { int a = center.x + x, b = center.y + y; if (x * x + y * y <= r * r && a >= 0 && a < 256 && b >= 0 && b < 256) pixels[b * 256 + a] = color; }

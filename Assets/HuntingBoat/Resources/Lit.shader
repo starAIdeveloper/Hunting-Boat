@@ -1,0 +1,22 @@
+Shader "HuntingBoat/Lit"
+{
+    Properties
+    {
+        _Color ("Albedo", Color)=(1,1,1,1)
+        _Metallic ("Metallic", Range(0,1))=0
+        _Glossiness ("Smoothness", Range(0,1))=0.3
+    }
+    SubShader
+    {
+        Tags { "RenderType"="Opaque" }
+        LOD 200
+        CGPROGRAM
+        #pragma surface surf Standard fullforwardshadows
+        #pragma target 3.0
+        fixed4 _Color; half _Metallic,_Glossiness;
+        struct Input { float3 worldPos; };
+        void surf(Input IN,inout SurfaceOutputStandard o) { o.Albedo=_Color.rgb; o.Metallic=_Metallic; o.Smoothness=_Glossiness; o.Alpha=1; }
+        ENDCG
+    }
+    Fallback "Diffuse"
+}

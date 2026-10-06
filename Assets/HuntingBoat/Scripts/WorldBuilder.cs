@@ -19,7 +19,7 @@ namespace HuntingBoat
     {
         private static Material Material(string name, Color color, float metallic = 0, float gloss = .3f)
         {
-            var m = new Material(Shader.Find("Standard")); m.name = name; m.color = color;
+            var m = new Material(Shader.Find("HuntingBoat/Lit")); m.name = name; m.color = color;
             m.SetFloat("_Metallic", metallic); m.SetFloat("_Glossiness", gloss); return m;
         }
         public static GameObject Shape(PrimitiveType type, Transform parent, string name, Vector3 position, Vector3 scale, Material material, bool collider = false)
@@ -111,7 +111,7 @@ namespace HuntingBoat
                 Shape(PrimitiveType.Sphere, buoy.transform, "Buoy beacon", Vector3.up * 2, Vector3.one * .3f, orange);
             }
             var sun = new GameObject("Sun"); world.Sun = sun.AddComponent<Light>(); world.Sun.type = LightType.Directional; world.Sun.shadows = LightShadows.Soft; world.Sun.shadowStrength = .7f;
-            var sky = new Material(Shader.Find("Skybox/Procedural")); sky.SetFloat("_SunSize", .055f); sky.SetFloat("_AtmosphereThickness", 1.1f); RenderSettings.skybox = sky;
+            var sky = new Material(Shader.Find("HuntingBoat/Sky")); sky.SetFloat("_Exposure", 1.1f); RenderSettings.skybox = sky;
             RenderSettings.fog = true; RenderSettings.fogMode = FogMode.ExponentialSquared; RenderSettings.fogDensity = .0018f;
             RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
             return world;
@@ -174,7 +174,7 @@ namespace HuntingBoat
             var p = g.AddComponent<ParticleSystem>(); var main = p.main; main.startLifetime = 2; main.startSpeed = 2; main.startSize = .45f; main.startColor = new Color(.75f, .94f, 1, .5f); main.simulationSpace = ParticleSystemSimulationSpace.World; main.maxParticles = 250;
             var emission = p.emission; emission.rateOverTime = 0;
             var shape = p.shape; shape.shapeType = ParticleSystemShapeType.Cone; shape.angle = 28; shape.radius = 1;
-            var renderer = p.GetComponent<ParticleSystemRenderer>(); renderer.sharedMaterial = new Material(Shader.Find("Particles/Standard Unlit")); return p;
+            var renderer = p.GetComponent<ParticleSystemRenderer>(); renderer.sharedMaterial = new Material(Shader.Find("HuntingBoat/Wake")); return p;
         }
     }
 }

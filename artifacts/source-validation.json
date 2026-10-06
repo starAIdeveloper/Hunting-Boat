@@ -1,0 +1,26 @@
+{
+  "static_status": "passed",
+  "csharp_files_parsed": 9,
+  "asset_guids": 24,
+  "custom_shaders": [
+    "HuntingBoat/Lit",
+    "HuntingBoat/Ocean",
+    "HuntingBoat/Sky",
+    "HuntingBoat/Wake"
+  ],
+  "checks": [
+    "C# syntax parsing",
+    "unique asset GUIDs",
+    "all asset metadata present",
+    "scene script/build GUID resolution",
+    "assembly/package JSON",
+    "custom shader lookup resolution",
+    "shader block balance"
+  ],
+  "unity_editor_available": false,
+  "unity_compile": "not run",
+  "unity_editmode_tests": "not run",
+  "unity_playmode": "not run",
+  "native_build": "not run",
+  "errors": []
+}

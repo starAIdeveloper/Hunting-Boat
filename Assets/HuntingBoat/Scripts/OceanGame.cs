@@ -73,6 +73,7 @@ namespace HuntingBoat
                     if (Vector3.Distance(new Vector3(World.Boat.transform.position.x, 0, World.Boat.transform.position.z), World.Spots[i]) < 32 && (Save.exploredMask & (1 << i)) == 0)
                     { Save.exploredMask |= 1 << i; Message = "Discovered " + World.SpotNames[i] + ". Stop and cast to begin fishing."; SaveVoyage(false); }
                 environmentTime += Time.deltaTime;
+                if (environmentTime >= 180) { environmentTime = 0; ChangeWeather(); }
                 mapTimer -= Time.deltaTime; if (mapTimer <= 0) { hud.UpdateMap(); mapTimer = .25f; }
             }
             else { World.Boat.Throttle = World.Boat.Steering = 0; }
@@ -138,7 +139,7 @@ namespace HuntingBoat
         }
         public void SaveVoyage(bool notify = true)
         {
-            Save.x = World.Boat.transform.position.x; Save.z = World.Boat.transform.position.z; Save.heading = World.Boat.Heading;
+            Save.x = Mathf.Clamp(World.Boat.transform.position.x, -850, 850); Save.z = Mathf.Clamp(World.Boat.transform.position.z, -850, 850); Save.heading = World.Boat.Heading;
             bool ok = SaveStore.Write(Save, out string error); if (notify || !ok) Message = ok ? "Voyage saved locally." : "Save failed: " + error;
         }
         public void LoadVoyage()
@@ -163,6 +164,9 @@ namespace HuntingBoat
             RenderSettings.fogDensity = storm ? .004f : .0018f;
             RenderSettings.skybox.SetFloat("_Exposure", night ? .14f : storm ? .5f : 1.1f);
             World.Water.SetFloat("_WaveScale", storm ? 2 : .9f);
+            RenderSettings.skybox.SetVector("_SunDirection", -World.Sun.transform.forward);
+            RenderSettings.skybox.SetColor("_SkyTop", night ? new Color(.015f,.035f,.10f) : storm ? new Color(.12f,.18f,.24f) : new Color(.12f,.36f,.60f));
+            RenderSettings.skybox.SetColor("_Horizon", kind == WeatherKind.Sunset ? new Color(.95f,.53f,.27f) : RenderSettings.fogColor);
         }
         private static AudioClip EngineSound()
         {
