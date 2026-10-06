@@ -1,0 +1,5 @@
+{
+  "name": "HuntingBoat.Runtime",
+  "rootNamespace": "HuntingBoat",
+  "references": ["Unity.ugui"]
+}
