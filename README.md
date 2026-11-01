@@ -2,6 +2,8 @@
 
 Unity 6 C# ocean fishing adventure inspired by the supplied boat-navigation and fishing references. The project contains a starting scene, procedural world and boat assets, a fishing loop, map, touch/keyboard controls, upgrades, local progression saves and Unity EditMode tests.
 
+![Ocean Hunter concept with a boat voyage, objectives, underwater fishing, catch rewards and gear](docs/reference/unity3d-2.png)
+
 **Validation status:** C# syntax parsing and asset/source integrity checks passed locally. Unity is not installed in the execution environment. Unity compilation, shader compilation, gameplay, EditMode tests and native player builds have **not** been run. This repository is an implemented source project awaiting Unity integration verification, not a verified executable or a photorealistic reproduction of the reference artwork.
 
 ## Design reference gallery
