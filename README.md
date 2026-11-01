@@ -4,6 +4,26 @@ Unity 6 C# ocean fishing adventure inspired by the supplied boat-navigation and 
 
 **Validation status:** C# syntax parsing and asset/source integrity checks passed locally. Unity is not installed in the execution environment. Unity compilation, shader compilation, gameplay, EditMode tests and native player builds have **not** been run. This repository is an implemented source project awaiting Unity integration verification, not a verified executable or a photorealistic reproduction of the reference artwork.
 
+## Design reference gallery
+
+Four user-supplied Ocean Hunter visual concepts. These are reference artwork, not screenshots of a verified Unity build. Features and platform logos shown in the artwork describe the concepts; implemented scope and validation status are documented in this README.
+
+### Fishing and exploration overview
+
+![Ocean Hunter concept showing boat navigation, fishing tension, island exploration, weather and equipment screens](docs/reference/unity3d-1.png)
+
+### Navigation and underwater fishing
+
+![Ocean Hunter concept with a boat voyage, objectives, underwater fishing, catch rewards and gear](docs/reference/unity3d-2.png)
+
+### Adventure and boat upgrades
+
+![Fishing adventure concept with island navigation, marine life, boat upgrades and weather variations](docs/reference/unity3d-3.png)
+
+### Shared-screen experience concept
+
+![Ocean Hunter concept with fishing, navigation, catch results, upgrades and a proposed multiplayer multi-screen setup](docs/reference/unity3d-4.png)
+
 ## Open and play
 
 1. Clone `https://github.com/starAIdeveloper/Hunting-Boat.git`.
